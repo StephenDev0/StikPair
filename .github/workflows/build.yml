@@ -21,7 +21,7 @@ jobs:
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "27.0"
+          xcode-version: "27.0-beta"
 
       - name: Export DEVELOPER_DIR
         run: echo "DEVELOPER_DIR=$(xcode-select -p)" >> "$GITHUB_ENV"

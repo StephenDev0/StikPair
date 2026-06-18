@@ -1,0 +1,8 @@
+rust/target/
+StikPair.xcodeproj/
+DerivedData/
+*.xcuserstate
+.DS_Store
+StikPairFFI.xcframework/
+build/
+*.ipa*

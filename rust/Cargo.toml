@@ -1,0 +1,21 @@
+[package]
+name = "stikpair_ffi"
+version = "0.1.0"
+edition = "2021"
+description = "C FFI shim over idevice's iOS-27 wireless pairing"
+
+[lib]
+name = "stikpair_ffi"
+crate-type = ["staticlib"]
+
+[dependencies]
+idevice = { git = "https://github.com/jkcoxson/idevice.git", rev = "7bd551c16c6dd2e058740d85a2d9399a51a776e9", default-features = false, features = [
+  "remote_pairing",
+  "aws-lc",
+] }
+
+tokio = { version = "1", features = ["rt-multi-thread", "net", "macros", "fs"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"

@@ -7,7 +7,11 @@ import UserNotifications
 final class PairingController: ObservableObject {
 
     static let shared = PairingController()
-    static let taskIdentifier = "com.stik.StikPair.pairing"
+    // Must match Info.plist BGTaskSchedulerPermittedIdentifiers, which is
+    // "$(PRODUCT_BUNDLE_IDENTIFIER).pairing". `$(…)` only expands in the plist,
+    // not in Swift, so derive it from the runtime bundle id (also survives a
+    // sideloader rewriting the bundle identifier).
+    static let taskIdentifier = (Bundle.main.bundleIdentifier ?? "com.stik.StikPair") + ".pairing"
 
     enum Phase: Equatable {
         case idle

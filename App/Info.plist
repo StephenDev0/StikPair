@@ -47,7 +47,7 @@
          user leaves the app to start pairing from Settings. -->
     <key>BGTaskSchedulerPermittedIdentifiers</key>
     <array>
-        <string>com.stik.StikPair.pairing</string>
+        <string>$(PRODUCT_BUNDLE_IDENTIFIER).pairing</string>
     </array>
 </dict>
 </plist>

@@ -25,6 +25,8 @@ pub type StikPairReadyCb = Option<
     ),
 >;
 
+pub type StikPairPinCb = Option<extern "C" fn(pin: *const c_char, ctx: *mut c_void)>;
+
 #[repr(C)]
 pub struct StikPairResult {
     pub error: *mut c_char,

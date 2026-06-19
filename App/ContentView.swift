@@ -4,22 +4,20 @@ struct ContentView: View {
     @StateObject private var controller = PairingController.shared
 
     var body: some View {
-        GlassEffectContainer(spacing: 24) {
-            VStack(spacing: 28) {
-                Spacer()
+        VStack(spacing: 28) {
+            Spacer()
 
-                appIcon
+            appIcon
 
-                Text("StikPair")
-                    .font(.largeTitle.bold())
+            Text("StikPair")
+                .font(.largeTitle.bold())
 
-                content
-                    .frame(maxWidth: 320)
+            content
+                .frame(maxWidth: 320)
 
-                Spacer()
-            }
-            .padding()
+            Spacer()
         }
+        .padding()
         .animation(.default, value: controller.phase)
     }
 
@@ -27,15 +25,19 @@ struct ContentView: View {
     private var content: some View {
         switch controller.phase {
         case .idle:
-            Button {
-                controller.start()
-            } label: {
-                Text("Pair")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
+            VStack(spacing: 20) {
+                Button {
+                    controller.start()
+                } label: {
+                    Text("Pair")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.glass)
+                .controlSize(.large)
+
+                keepAliveOptions
             }
-            .buttonStyle(.glassProminent)
-            .controlSize(.large)
 
         case .waiting:
             VStack(spacing: 16) {
@@ -54,6 +56,11 @@ struct ContentView: View {
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .glassEffect(.regular, in: .rect(cornerRadius: 20))
+
+                Text("If **Pair with StikPair** doesn't show up, close the app and try again.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
 
         case .showPin(let pin):
@@ -85,9 +92,12 @@ struct ContentView: View {
                     Label("Export Pairing File", systemImage: "square.and.arrow.up")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.glassProminent)
+                .buttonStyle(.glass)
                 .controlSize(.large)
                 .padding(.top, 4)
+
+                Button("Done") { controller.reset() }
+                    .buttonStyle(.glass)
             }
 
         case .failed(let message):
@@ -101,11 +111,26 @@ struct ContentView: View {
                     .multilineTextAlignment(.center)
                     .textSelection(.enabled)
                 Button("Try Again") { controller.reset() }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.glass)
                     .controlSize(.large)
                     .padding(.top, 4)
             }
         }
+    }
+
+    private var keepAliveOptions: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Background keep-alive")
+                .font(.subheadline.weight(.semibold))
+            Toggle("Silent audio", isOn: $controller.keepAliveAudio)
+            Toggle("Location", isOn: $controller.keepAliveLocation)
+            Text("Enable one or more of these if the Live Activity doesn't start.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassEffect(.regular, in: .rect(cornerRadius: 20))
     }
 
     private var appIcon: some View {

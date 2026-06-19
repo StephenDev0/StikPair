@@ -7,10 +7,6 @@ import UserNotifications
 final class PairingController: ObservableObject {
 
     static let shared = PairingController()
-    // Must match Info.plist BGTaskSchedulerPermittedIdentifiers, which is
-    // "$(PRODUCT_BUNDLE_IDENTIFIER).pairing". `$(…)` only expands in the plist,
-    // not in Swift, so derive it from the runtime bundle id (also survives a
-    // sideloader rewriting the bundle identifier).
     static let taskIdentifier = (Bundle.main.bundleIdentifier ?? "com.stik.StikPair") + ".pairing"
 
     enum Phase: Equatable {
@@ -30,11 +26,19 @@ final class PairingController: ObservableObject {
 
     @Published var phase: Phase = .idle
 
+    @Published var keepAliveAudio: Bool = UserDefaults.standard.bool(forKey: "keepAlive.audio") {
+        didSet { UserDefaults.standard.set(keepAliveAudio, forKey: "keepAlive.audio") }
+    }
+    @Published var keepAliveLocation: Bool = UserDefaults.standard.bool(forKey: "keepAlive.location") {
+        didSet { UserDefaults.standard.set(keepAliveLocation, forKey: "keepAlive.location") }
+    }
+
     private let bindAddress = "0.0.0.0"
     private let hostName = "StikPair"
 
     private var netService: NetService?
     private let localNetwork = LocalNetworkAuthorization()
+    private let keepAlive = KeepAlive()
 
     private var bgTask: BGContinuedProcessingTask?
     private var pairingStarted = false
@@ -59,16 +63,18 @@ final class PairingController: ObservableObject {
         }
     }
 
-    // MARK: - Flow
-
     func start() {
         guard !isRunning else { return }
         phase = .waiting
 
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
 
+        if keepAliveAudio { keepAlive.startAudio() }
+        if keepAliveLocation { keepAlive.startLocation() }
+
         Task {
             guard await localNetwork.request() else {
+                keepAlive.stopAll()
                 phase = .failed("Local Network permission is required. Enable it in Settings › StikPair › Local Network, then try again.")
                 return
             }
@@ -109,6 +115,7 @@ final class PairingController: ObservableObject {
         task?.progress.completedUnitCount = 5
         task?.expirationHandler = { [weak self] in
             guard let self else { return }
+            self.keepAlive.stopAll()
             self.finishTask(success: false)
             if self.isRunning {
                 self.phase = .failed("Background time expired before a device connected. Tap Pair to try again.")
@@ -151,6 +158,7 @@ final class PairingController: ObservableObject {
 
             DispatchQueue.main.async {
                 self.stopAdvertising()
+                self.keepAlive.stopAll()
                 self.pairingStarted = false
                 self.phase = outcome
                 if case .success = outcome {
@@ -169,8 +177,6 @@ final class PairingController: ObservableObject {
         bgTask = nil
     }
 
-    // MARK: - Callback handlers (main thread)
-
     fileprivate func startAdvertising(serviceID: String, port: Int32, txt: [String: Data]) {
         stopAdvertising()
         let service = NetService(
@@ -187,14 +193,17 @@ final class PairingController: ObservableObject {
         phase = .showPin(pin)
         bgTask?.progress.completedUnitCount = 50
         bgTask?.updateTitle("StikPair", subtitle: "Enter code \(pin) on this device")
+        if keepAliveAudio || keepAliveLocation {
+            notify(id: "stikpair.pin",
+                   title: "StikPair pairing code",
+                   body: "Enter \(pin) on this device to pair.")
+        }
     }
 
     private func stopAdvertising() {
         netService?.stop()
         netService = nil
     }
-
-    // MARK: - Notifications
 
     private func postReturnNotification() {
         notify(id: "stikpair.done",
@@ -216,8 +225,6 @@ final class PairingController: ObservableObject {
         return docs.appendingPathComponent("rp_pairing_file.plist").path
     }
 }
-
-// MARK: - C callbacks
 
 private let readyCallback: StikPairReadyCb = { ctx, serviceID, port, keys, vals, count in
     guard let ctx = ctx, let serviceID = serviceID else { return }

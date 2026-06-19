@@ -49,5 +49,14 @@
     <array>
         <string>$(PRODUCT_BUNDLE_IDENTIFIER).pairing</string>
     </array>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>audio</string>
+        <string>location</string>
+    </array>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>StikPair can use location to keep running in the background while you complete pairing in Settings.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>StikPair can use location to keep running in the background while you complete pairing in Settings.</string>
 </dict>
 </plist>

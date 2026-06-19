@@ -1,4 +1,8 @@
 {
+  "features" : [
+    "refractivity",
+    "specular-location"
+  ],
   "fill" : {
     "linear-gradient" : [
       "display-p3:0.38110,0.78809,0.97949,1.00000",
@@ -7,6 +11,7 @@
   },
   "groups" : [
     {
+      "blur-material" : 0.5,
       "layers" : [
         {
           "image-name" : "WiFi.svg",
@@ -33,9 +38,6 @@
       "blur-material" : 0.5,
       "layers" : [
         {
-          "blend-mode" : "normal",
-          "fill" : "automatic",
-          "glass" : true,
           "image-name" : "iPhone 16.svg",
           "name" : "iPhone 16"
         }
@@ -51,26 +53,43 @@
         "kind" : "neutral",
         "opacity" : 0.5
       },
-      "translucency-specializations" : [
-        {
-          "value" : {
-            "enabled" : true,
-            "value" : 0.5
-          }
-        },
-        {
-          "appearance" : "tinted",
-          "value" : {
-            "enabled" : true,
-            "value" : 0.8
-          }
-        }
-      ]
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.2
+      }
     },
     {
-      "blur-material" : 0.1,
+      "blur-material" : 0.05,
       "layers" : [
-
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.31048,0.65572,0.87162,0.50000",
+                  "display-p3:0.19327,0.40009,0.84344,0.50000"
+                ]
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.16090,0.16248,0.16248,0.50000",
+                  "display-p3:0.17664,0.17712,0.17773,0.50000"
+                ]
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "display-p3:0.14969,0.44875,0.87162,0.50000"
+              }
+            }
+          ],
+          "image-name" : "Vector.png",
+          "name" : "Vector"
+        }
       ],
       "position" : {
         "scale" : 1.49,
@@ -79,25 +98,39 @@
           0
         ]
       },
+      "refractivity" : {
+        "depth" : 0.38042968749999995,
+        "enabled" : true,
+        "strength" : -0.3591796875
+      },
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5
       },
+      "specular" : "inside",
       "translucency" : {
-        "enabled" : true,
+        "enabled" : false,
         "value" : 0.5
       }
     },
     {
       "layers" : [
-
+        {
+          "fill" : {
+            "solid" : "extended-gray:1.00000,0.30000"
+          },
+          "glass" : false,
+          "image-name" : "2Grid.svg",
+          "name" : "2Grid"
+        }
       ],
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5
       },
+      "specular" : false,
       "translucency" : {
-        "enabled" : true,
+        "enabled" : false,
         "value" : 0.5
       }
     }
